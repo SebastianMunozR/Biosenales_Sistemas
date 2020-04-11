@@ -9,7 +9,8 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QFileDialog
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIntValidator
-
+import matplotlib.pyplot as plt;
+import scipy.signal as signal;
 
 from matplotlib.figure import Figure
 
@@ -63,6 +64,7 @@ class MyGraphCanvas(FigureCanvas):
         #ordenamos que dibuje
         self.axes.figure.canvas.draw()
         
+        
     def graficar_senal(self,senal):
         self.axes.clear()
         if senal.ndim == 1:
@@ -90,7 +92,7 @@ class InterfazGrafico(QMainWindow):
         #siempre va
         super(InterfazGrafico,self).__init__()
         #se carga el diseno
-        loadUi ('anadir_grafico.ui',self)
+        loadUi ('anadir_grafico2.ui',self)
         #se llama la rutina donde configuramos la interfaz
         self.setup()
     
@@ -125,6 +127,13 @@ class InterfazGrafico(QMainWindow):
         self.boton_one.toggled.connect(self.one)
         self.boton_single.toggled.connect(self.sln)
         self.boton_mult.toggled.connect(self.mln)
+        self.graficarw.clicked.connect(self.Me_Welch)
+        
+        #Botones para el segundo trabajo
+        self.welch_tamano.setValidator(QIntValidator())
+        self.welch_solapa.setValidator(QIntValidator())
+        self.tipoDeVentanaComboBox1.setEnabled(False)
+        self.graficarw.setEnabled(False)
         
         #hay botones que no deberian estar habilitados si no he cargado la senal
         self.boton_adelante.setEnabled(False)
@@ -141,6 +150,8 @@ class InterfazGrafico(QMainWindow):
         self.boton_single.setEnabled(False)
         self.boton_mult.setEnabled(False)
         self.boton_filtro.setEnabled(False)
+        self.boton_ok.setEnabled(False)
+        self.comboBox.setEnabled(False)
         self.show()
         #cuando cargue la senal debo volver a habilitarlos
     def asignar_Controlador(self,controlador):
@@ -252,10 +263,34 @@ class InterfazGrafico(QMainWindow):
         archivo=open("Senal Filtrada.mat","w")
         archivo.write(str(self.recon))
         archivo.close()
+    
+    def Mostrar_senal(self):
+        self.senal=self.data[str(self.comboBox.currentText())]
+        #senal=np.squeeze(senal)
+        self.__coordinador.recibirDatosSenal(self.senal)
+        self.__x_min=0
+        self.__x_max=2000
+        #graficar utilizando el controlador
+        self.__sc.graficar_datos(self.__coordinador.devolverDatosSenal(self.__x_min,self.__x_max))
+        self.boton_adelante.setEnabled(True)
+        self.boton_atras.setEnabled(True)
+        self.boton_aumentar.setEnabled(True)
+        self.boton_disminuir.setEnabled(True)
+        self.boton_canal.setEnabled(True)
+        self.tipoDeVentanaComboBox1.setEnabled(True)
+        self.graficarw.setEnabled(True)
+        self.boton_canal.setEnabled(False)
+        
 
 
-        
-        
+    def Me_Welch(self):
+        tamano=int(self.welch_tamano.text())
+        solapamiento=int(self.welch_solapa.text())
+        tipo=str(self.tipoDeVentanaComboBox1.currentText())
+        fs=250
+        f, Pxx = signal.welch(self.senal,fs,tipo,tamano, solapamiento, 512, scaling='density')
+        self.__sc.graficar_datos(self.__coordinador.devolverDatosSenal(self.__x_min,self.__x_max))
+
     def cargar_senal(self):
         #se abre el cuadro de dialogo para cargar
         #* son archivos .mat y .txt
@@ -263,22 +298,38 @@ class InterfazGrafico(QMainWindow):
         if archivo_cargado != "":
             print(archivo_cargado)
             #la senal carga exitosamente entonces habilito los botones
-            data = sio.loadmat(archivo_cargado)
-            data = data["data"]
-            #volver continuos los datos
-            sensores,puntos,ensayos=data.shape
-            senal_continua=np.reshape(data,(sensores,puntos*ensayos),order="F")
-            #el coordinador recibe y guarda la senal en su propio .py, por eso no 
-            #necesito una variable que lo guarde en el .py interfaz
-            self.__coordinador.recibirDatosSenal(senal_continua)
-            self.__x_min=0
-            self.__x_max=2000
-            #graficar utilizando el controlador
-            self.__sc.graficar_datos(self.__coordinador.devolverDatosSenal(self.__x_min,self.__x_max))
-            self.boton_adelante.setEnabled(True)
-            self.boton_atras.setEnabled(True)
-            self.boton_aumentar.setEnabled(True)
-            self.boton_disminuir.setEnabled(True)
-            self.boton_canal.setEnabled(True)
+            self.data = sio.loadmat(archivo_cargado)
+            if len(self.data.keys()) <= 4:
+                self.data = self.data["data"]
+                #volver continuos los datos
+                sensores,puntos,ensayos=self.data.shape
+                senal_continua=np.reshape(self.data,(sensores,puntos*ensayos),order="F")
+                #el coordinador recibe y guarda la senal en su propio .py, por eso no 
+                #necesito una variable que lo guarde en el .py interfaz
+                print('tipo de senal')
+                print(type(senal_continua))
+                print(np.shape(senal_continua))
+                self.__coordinador.recibirDatosSenal(senal_continua)
+                print('tipo de senal')
+                print(type(senal_continua))
+                print(np.shape(senal_continua))
+                self.__x_min=0
+                self.__x_max=2000
+                #graficar utilizando el controlador
+                self.__sc.graficar_datos(self.__coordinador.devolverDatosSenal(self.__x_min,self.__x_max))
+                self.boton_adelante.setEnabled(True)
+                self.boton_atras.setEnabled(True)
+                self.boton_aumentar.setEnabled(True)
+                self.boton_disminuir.setEnabled(True)
+                self.boton_canal.setEnabled(True)            
+            if len(self.data.keys()) > 4:
+                for item in list(self.data.keys())[3::]:
+                    self.comboBox.addItem(item)
+                self.comboBox.setEnabled(True)
+                self.boton_ok.setEnabled(True)
+                self.boton_ok.clicked.connect(self.Mostrar_senal)
+        
+
+
 
         
