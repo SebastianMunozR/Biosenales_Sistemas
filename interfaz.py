@@ -1,7 +1,3 @@
-"""
-David Alejandro Ijaji Guerrero       C.C.1017250858
-Edison Sebastian Munoz Rodriguez     C.C 1214745427
-"""
 #%%Librerias
 import sys
 #Qfiledialog es una ventana para abrir yu gfuardar archivos
@@ -11,15 +7,16 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIntValidator
 import matplotlib.pyplot as plt;
 import scipy.signal as signal;
-
+from chronux.mtspectrumc import mtspectrumc
 from matplotlib.figure import Figure
-
 from PyQt5.uic import loadUi
-
 from numpy import arange, sin, pi
+
+from IPython import get_ipython
+import pywt
+
 #contenido para graficos de matplotlib
 from matplotlib.backends. backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-
 import scipy.io as sio
 import numpy as np
 from Modelo import Biosenal
@@ -63,7 +60,6 @@ class MyGraphCanvas(FigureCanvas):
         #self.axes.set
         #ordenamos que dibuje
         self.axes.figure.canvas.draw()
-        
         
     def graficar_senal(self,senal):
         self.axes.clear()
@@ -128,12 +124,38 @@ class InterfazGrafico(QMainWindow):
         self.boton_single.toggled.connect(self.sln)
         self.boton_mult.toggled.connect(self.mln)
         self.graficarw.clicked.connect(self.Me_Welch)
+        self.graficarm.clicked.connect(self.Me_Multi)
+        self.graficarescalog.clicked.connect(self.Grafica_fvt)
         
-        #Botones para el segundo trabajo
+#        Botones para el segundo trabajo
+        
+#        welch
         self.welch_tamano.setValidator(QIntValidator())
         self.welch_solapa.setValidator(QIntValidator())
+        self.nfft.setValidator(QIntValidator())
+        self.fsw.setValidator(QIntValidator())
         self.tipoDeVentanaComboBox1.setEnabled(False)
         self.graficarw.setEnabled(False)
+        
+#       multitaper
+        self.multiw.setValidator(QIntValidator())
+        self.multit.setValidator(QIntValidator())
+        self.multip.setValidator(QIntValidator())
+        self.fsm.setValidator(QIntValidator())
+        self.flow.setValidator(QIntValidator())
+        self.fhigh.setValidator(QIntValidator())
+        self.graficarm.setEnabled(False)
+#       frecuencia vs tiempo
+#        self.tffs.setValidator(QIntValidator())
+        self.FT_fh.setValidator(QIntValidator())
+        self.FT_fl.setValidator(QIntValidator())
+        self.FT_fs.setValidator(QIntValidator())
+#        self.TF_sh.setValidator(QIntValidator())
+#        self.TF_tl.setValidator(QIntValidator())
+#        self.TF_th.setValidator(QIntValidator())
+        self.graficarescalog.setEnabled(False)    
+
+
         
         #hay botones que no deberian estar habilitados si no he cargado la senal
         self.boton_adelante.setEnabled(False)
@@ -195,7 +217,6 @@ class InterfazGrafico(QMainWindow):
         self.boton_single.setEnabled(True)
         self.boton_mult.setEnabled(True)
         self.boton_filtro.setEnabled(True)
-        
         return self.datos
         
             
@@ -266,7 +287,6 @@ class InterfazGrafico(QMainWindow):
     
     def Mostrar_senal(self):
         self.senal=self.data[str(self.comboBox.currentText())]
-        #senal=np.squeeze(senal)
         self.__coordinador.recibirDatosSenal(self.senal)
         self.__x_min=0
         self.__x_max=2000
@@ -276,21 +296,84 @@ class InterfazGrafico(QMainWindow):
         self.boton_atras.setEnabled(True)
         self.boton_aumentar.setEnabled(True)
         self.boton_disminuir.setEnabled(True)
-        self.boton_canal.setEnabled(True)
+        #botones del welch
         self.tipoDeVentanaComboBox1.setEnabled(True)
         self.graficarw.setEnabled(True)
-        self.boton_canal.setEnabled(False)
-        
-
+        #botones del multitaper
+        self.graficarm.setEnabled(True)
+        #botones del fvst
+        self.graficarescalog.setEnabled(True)
+    
+    def Grafica_fvt(self):
+        fs=int(self.FT_fs.text())
+        fl=int(self.FT_fl.text())
+        fh=int(self.FT_fh.text())
+        senal=self.senal-np.mean(self.senal)
+        senal=np.squeeze(senal)
+        N=senal.shape[0]        
+        get_ipython().run_line_magic('matplotlib', 'qt')
+        sampling_period =  1/fs
+        Frequency_Band = [fl, fh] # Banda de frecuencia a analizar
+        # Métodos de obtener las escalas para el Complex Morlet Wavelet  
+        # Método 1:
+        # Determinar las frecuencias respectivas para una escalas definidas
+        scales = np.arange(1,N)
+        frequencies = pywt.scale2frequency('cmor', scales)/sampling_period
+        # Extraer las escalas correspondientes a la banda de frecuencia a analizar
+        scales = scales[(frequencies >= Frequency_Band[0]) & (frequencies <= Frequency_Band[1])]
+        time_epoch = sampling_period*N
+        # Analizar una epoca de un montaje (con las escalas del método 1)
+        # Obtener el vector de tiempo adecuado para una epoca de un montaje de la señal
+        time = np.arange(0, time_epoch, sampling_period)
+        scales=np.squeeze(scales)
+        # Para la primera epoca del segundo montaje calcular la transformada continua de Wavelet, usando Complex Morlet Wavelet
+        [coef, freqs] = pywt.cwt(senal, scales, 'cmor', sampling_period)
+        # Calcular la potencia 
+        power = np.power(np.abs(coef),2)
+        # Graficar el escalograma obtenido del análisis tiempo frecuencia
+        f, ax = plt.subplots(figsize=(15, 10))
+        scalogram = ax.contourf(time,
+                        freqs[(freqs >= 4) & (freqs <= 40)],
+                        power[(freqs >= 4) & (freqs <= 40),:],
+                         100, # Especificar 20 divisiones en las escalas de color 
+                         extend='both')
+        ax.set_ylim(4, 40)
+        ax.set_ylabel('Frequencia [Hz]')
+        ax.set_xlabel('Tiempo [s]')
+        cbar = plt.colorbar(scalogram)
 
     def Me_Welch(self):
+        self.senal=self.senal-np.mean(self.senal)
         tamano=int(self.welch_tamano.text())
         solapamiento=int(self.welch_solapa.text())
         tipo=str(self.tipoDeVentanaComboBox1.currentText())
-        fs=250
-        f, Pxx = signal.welch(self.senal,fs,tipo,tamano, solapamiento, 512, scaling='density')
+        fs=int(self.fsw.text())
+        nfft=int(self.nfft.text())
+        f, Pxx = signal.welch(self.senal,fs,tipo,tamano, solapamiento, nfft, scaling='density')
+        self.__coordinador.recibirDatosSenal(Pxx)
+        self.__x_min=0
+        self.__x_max=2000
         self.__sc.graficar_datos(self.__coordinador.devolverDatosSenal(self.__x_min,self.__x_max))
-
+    
+    def Me_Multi(self):
+        self.senal=self.senal-np.mean(self.senal)
+        fsm=int(self.fsm.text())
+        flow=int(self.flow.text())
+        fhigh=int(self.fhigh.text())
+        w=int(self.multiw.text())
+        t=int(self.multit.text())
+        p=int(self.multip.text())
+        params = dict(fs = fsm, fpass = [flow, fhigh], tapers = [w, t, p], trialave = 1)
+        data = np.reshape(self.senal,(fsm*5,10),order='F')
+        Pxx, f = mtspectrumc(data, params)
+        Pxx=Pxx[(f >= 4) & (f <= 40)]
+        Pxx=Pxx.reshape(1,len(Pxx))
+        self.__coordinador.recibirDatosSenal(Pxx)
+        self.__x_min=0
+        self.__x_max=2000
+        self.__sc.graficar_datos(self.__coordinador.devolverDatosSenal(self.__x_min,self.__x_max))
+    
+        
     def cargar_senal(self):
         #se abre el cuadro de dialogo para cargar
         #* son archivos .mat y .txt
@@ -328,6 +411,9 @@ class InterfazGrafico(QMainWindow):
                 self.comboBox.setEnabled(True)
                 self.boton_ok.setEnabled(True)
                 self.boton_ok.clicked.connect(self.Mostrar_senal)
+                print("SENAL CARGADA")
+                print("SELECCIONE SENAL")
+    
         
 
 

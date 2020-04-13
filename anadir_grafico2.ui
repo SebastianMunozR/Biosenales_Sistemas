@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1101</width>
-    <height>436</height>
+    <width>1149</width>
+    <height>550</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>20</y>
+      <y>40</y>
       <width>571</width>
       <height>361</height>
      </rect>
@@ -27,8 +27,8 @@
    <widget class="QPushButton" name="boton_cargar">
     <property name="geometry">
      <rect>
-      <x>640</x>
-      <y>30</y>
+      <x>660</x>
+      <y>40</y>
       <width>91</width>
       <height>31</height>
      </rect>
@@ -40,8 +40,8 @@
    <widget class="QPushButton" name="boton_atras">
     <property name="geometry">
      <rect>
-      <x>610</x>
-      <y>330</y>
+      <x>90</x>
+      <y>420</y>
       <width>51</width>
       <height>23</height>
      </rect>
@@ -53,8 +53,8 @@
    <widget class="QPushButton" name="boton_adelante">
     <property name="geometry">
      <rect>
-      <x>710</x>
-      <y>330</y>
+      <x>190</x>
+      <y>420</y>
       <width>51</width>
       <height>23</height>
      </rect>
@@ -66,8 +66,8 @@
    <widget class="QPushButton" name="boton_aumentar">
     <property name="geometry">
      <rect>
-      <x>970</x>
-      <y>330</y>
+      <x>460</x>
+      <y>420</y>
       <width>51</width>
       <height>23</height>
      </rect>
@@ -79,8 +79,8 @@
    <widget class="QPushButton" name="boton_disminuir">
     <property name="geometry">
      <rect>
-      <x>870</x>
-      <y>330</y>
+      <x>360</x>
+      <y>420</y>
       <width>51</width>
       <height>23</height>
      </rect>
@@ -92,8 +92,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>610</x>
-      <y>360</y>
+      <x>90</x>
+      <y>450</y>
       <width>201</width>
       <height>16</height>
      </rect>
@@ -105,8 +105,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>870</x>
-      <y>360</y>
+      <x>360</x>
+      <y>450</y>
       <width>181</width>
       <height>16</height>
      </rect>
@@ -118,9 +118,9 @@
    <widget class="QPushButton" name="boton_canal">
     <property name="geometry">
      <rect>
-      <x>900</x>
-      <y>30</y>
-      <width>121</width>
+      <x>870</x>
+      <y>70</y>
+      <width>131</width>
       <height>31</height>
      </rect>
     </property>
@@ -131,8 +131,8 @@
    <widget class="QPushButton" name="boton_filtro">
     <property name="geometry">
      <rect>
-      <x>790</x>
-      <y>270</y>
+      <x>930</x>
+      <y>450</y>
       <width>93</width>
       <height>31</height>
      </rect>
@@ -144,9 +144,9 @@
    <widget class="QLineEdit" name="campo_canal">
     <property name="geometry">
      <rect>
-      <x>830</x>
-      <y>30</y>
-      <width>51</width>
+      <x>1020</x>
+      <y>70</y>
+      <width>41</width>
       <height>31</height>
      </rect>
     </property>
@@ -157,9 +157,9 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>840</x>
-      <y>60</y>
-      <width>41</width>
+      <x>1020</x>
+      <y>100</y>
+      <width>31</width>
       <height>16</height>
      </rect>
     </property>
@@ -170,10 +170,10 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>640</x>
-      <y>130</y>
-      <width>131</width>
-      <height>131</height>
+      <x>830</x>
+      <y>360</y>
+      <width>91</width>
+      <height>99</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -181,6 +181,9 @@
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Umbral</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -210,10 +213,10 @@
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>130</y>
-      <width>121</width>
-      <height>111</height>
+      <x>930</x>
+      <y>360</y>
+      <width>91</width>
+      <height>72</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -222,12 +225,8 @@
        <property name="text">
         <string>Filtro</string>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="boton_duro">
-       <property name="text">
-        <string>Duro</string>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -238,15 +237,22 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QRadioButton" name="boton_duro">
+       <property name="text">
+        <string>Duro</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>910</x>
-      <y>130</y>
-      <width>160</width>
-      <height>131</height>
+      <x>1030</x>
+      <y>360</y>
+      <width>111</width>
+      <height>99</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -255,12 +261,8 @@
        <property name="text">
         <string>Ponderación</string>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="boton_one">
-       <property name="text">
-        <string>One</string>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -268,6 +270,13 @@
       <widget class="QRadioButton" name="boton_single">
        <property name="text">
         <string>Single</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="boton_one">
+       <property name="text">
+        <string>One</string>
        </property>
       </widget>
      </item>
@@ -283,32 +292,301 @@
    <widget class="QComboBox" name="comboBox">
     <property name="geometry">
      <rect>
-      <x>750</x>
-      <y>80</y>
-      <width>141</width>
-      <height>41</height>
+      <x>870</x>
+      <y>20</y>
+      <width>131</width>
+      <height>31</height>
      </rect>
     </property>
     <item>
      <property name="text">
-      <string>Seleccione Canal...</string>
+      <string>Seleccione Señal</string>
      </property>
     </item>
-    <item>
-     <property name="text">
-      <string>Ojos Abiertos</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Ojos Cerrados</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Sure</string>
-     </property>
-    </item>
+   </widget>
+   <widget class="QPushButton" name="boton_ok">
+    <property name="geometry">
+     <rect>
+      <x>1020</x>
+      <y>20</y>
+      <width>41</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>OK</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="formLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>120</y>
+      <width>211</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0" colspan="2">
+      <widget class="QLabel" name="parametrosMetodoDeWelchLabel">
+       <property name="text">
+        <string>Parametros Metodo de Welch</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="tipoDeVentanaLabel">
+       <property name="text">
+        <string>Tipo de Ventana</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="tipoDeVentanaComboBox1">
+       <item>
+        <property name="text">
+         <string>hanning</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>hamming</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>rectangular</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>blackman</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>barlett</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="tamaOLabel">
+       <property name="text">
+        <string>Tamaño</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="welch_tamano"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="solapamientoLabel">
+       <property name="text">
+        <string>Solapamiento</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="welch_solapa"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="frecuenciaInteresLabel">
+       <property name="text">
+        <string>Frecuencia Interes</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="fsw"/>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="nfft"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="nfftLabel">
+       <property name="text">
+        <string>        NFFT</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="formLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>120</y>
+      <width>231</width>
+      <height>199</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="1" column="0" colspan="2">
+      <widget class="QLabel" name="parametrosMetodoDeWelchLabel_2">
+       <property name="text">
+        <string>Parametros Metodo Multitaper</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="tamaOLabel_2">
+       <property name="text">
+        <string>Ancho de Banda</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="multiw"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="solapamientoLabel_2">
+       <property name="text">
+        <string>Efecto Banda Cercana</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="multit"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="pLabel">
+       <property name="text">
+        <string>           P</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="multip"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="frecuenciaDeInteresLabel">
+       <property name="text">
+        <string>Frecuencia de Interes</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="fsm"/>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="frecuenciaBajaDePasoLabel">
+       <property name="text">
+        <string>Frecuencia Baja de Paso</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="flow"/>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="frecuenciaAltaDePasoLabel">
+       <property name="text">
+        <string>Frecuencia Alta de Paso</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLineEdit" name="fhigh"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="graficarw">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>300</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Graficar</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="graficarm">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>320</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Graficar</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="formLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>350</y>
+      <width>196</width>
+      <height>105</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="formLayout_3">
+     <item row="0" column="0" colspan="2">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Analisis Tiempo Frecuencia</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="frecuenciaDeInteresLabel_2">
+       <property name="text">
+        <string>Frecuencia de Interes</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="FT_fs"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="frecuenciaBajaLabel">
+       <property name="text">
+        <string>Frecuencia Baja</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="FT_fl"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="frecuenciaAltaLabel">
+       <property name="text">
+        <string>Frecuencia Alta</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="FT_fh"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="graficarescalog">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>460</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Graficar</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -316,7 +594,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1101</width>
+     <width>1149</width>
      <height>26</height>
     </rect>
    </property>

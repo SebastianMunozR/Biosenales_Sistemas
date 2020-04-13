@@ -5,8 +5,9 @@ Edison Sebastian Munoz Rodriguez     C.C 1214745427
 from Modelo import Biosenal
 from interfaz import InterfazGrafico
 import sys
-
 from PyQt5.QtWidgets import QApplication
+from chronux.mtspectrumc import mtspectrumc
+
 class Principal(object):
     def __init__(self):        
         self.__app=QApplication(sys.argv)
@@ -71,19 +72,6 @@ class Coordinador(object):
     def filsuave(self):
         return self.__mi_biosenal.filsuave()
     
-    
-#        
-#    def Filtrado(self, c, xmin, xmax):
-#        return self.__mi_biosenal.Filtrado(c, xmin, xmax)
-#
-#    def Filtradomln(self, c, xmin, xmax):
-#        return self.__mi_biosenal.Filtradomln(c, xmin, xmax)
-#
-#    def filtro(self, c, xmin, xmax):
-#        return self.__mi_biosenal.filtro(c, xmin, xmax)     
-#    
-#    def Reconstruccion(self,x_min,x_max):
-#        return self.__mi_biosenal.Reconstruccion(c, xmin, xmax)
     
 p=Principal()
 p.main()

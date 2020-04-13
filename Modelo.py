@@ -4,7 +4,7 @@ Edison Sebastian Munoz Rodriguez     C.C 1214745427
 """
 import numpy as np
 import math
-
+from chronux.mtspectrumc import mtspectrumc
 
 class Biosenal(object):
     def __init__(self,data=None):
@@ -16,6 +16,11 @@ class Biosenal(object):
             self.__canales=0
             self.__puntos=0
     def asignarDatos(self,data):
+        self.__data=data
+        self.__canales=data.shape[0]
+        self.__puntos=data.shape[1]
+        
+    def asignarDatos2(self,data):
         self.__data=data
         self.__canales=data.shape[0]
         self.__puntos=data.shape[1]
