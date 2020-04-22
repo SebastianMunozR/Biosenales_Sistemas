@@ -1,3 +1,7 @@
+"""
+David Alejandro Ijaji Guerrero       C.C.1017250858
+Edison Sebastian Munoz Rodriguez     C.C 1214745427
+"""
 #%%Librerias
 import sys
 #Qfiledialog es una ventana para abrir yu gfuardar archivos
@@ -11,7 +15,7 @@ from chronux.mtspectrumc import mtspectrumc
 from matplotlib.figure import Figure
 from PyQt5.uic import loadUi
 from numpy import arange, sin, pi
-
+import math
 from IPython import get_ipython
 import pywt
 
@@ -32,7 +36,7 @@ class MyGraphCanvas(FigureCanvas):
 
         #llamo al metodo para crear el primer grafico
         self.compute_initial_figure()
-        
+        self.barraexist=False#para saber si la barra de colores del wavelet existe
         #se inicializa la clase FigureCanvas con el objeto fig
         FigureCanvas.__init__(self,self.fig)
         
@@ -69,6 +73,36 @@ class MyGraphCanvas(FigureCanvas):
             DC = 10 
             for canal in range(senal.shape[0]):
                 self.axes.plot(senal[canal,:]+DC*canal)
+        self.axes.figure.canvas.draw()
+        
+    def graficar_metodos(self,Pxx,f,metodo):
+        if self.barraexist == True:#si la barra existe hay que eliminarla
+            self.barra.remove()#la borro
+            self.barraexist = False#si la borro deja de exixtir 
+        self.axes.clear()# se limpia la ventana
+        self.axes.plot(Pxx,f)
+        #y lo graficamos
+        if metodo == "welch":
+            ejex="Frequency[Hz]"
+            ejey="PSD [V**2/Hz]"
+        if metodo == "multitaper":
+            ejex="Frequency[Hz]"
+            ejey="PSD"
+        self.axes.set_xlabel(ejex)
+        self.axes.set_ylabel(ejey)
+        self.axes.figure.canvas.draw()
+        
+    def graficar_senal3D(self,time,freqs,power,fl,fh,ti,tf,fs):
+        self.barraexist=True
+        self.axes.clear()
+        self.axes.set_ylabel("Frecuencia [Hz]")
+        self.axes.set_xlabel("Tiempo [s]")
+        scalogram=self.axes.contourf(time[fs*ti:fs*tf],
+                        freqs[(freqs >= fl) & (freqs <= fh)],
+                        power[(freqs >= fl) & (freqs <= fh),fs*ti:fs*tf],
+                         20, # Especificar 20 divisiones en las escalas de color 
+                         extend='both')
+        self.barra=self.fig.colorbar(scalogram)
         self.axes.figure.canvas.draw()
         
     def graficar_2senal(self,sena,senb):
@@ -125,14 +159,12 @@ class InterfazGrafico(QMainWindow):
         self.boton_mult.toggled.connect(self.mln)
         self.graficarw.clicked.connect(self.Me_Welch)
         self.graficarm.clicked.connect(self.Me_Multi)
-        self.graficarescalog.clicked.connect(self.Grafica_fvt)
+        self.graficarescalog.clicked.connect(self.Me_Wavelet)
         
 #        Botones para el segundo trabajo
-        
 #        welch
         self.welch_tamano.setValidator(QIntValidator())
         self.welch_solapa.setValidator(QIntValidator())
-        self.nfft.setValidator(QIntValidator())
         self.fsw.setValidator(QIntValidator())
         self.tipoDeVentanaComboBox1.setEnabled(False)
         self.graficarw.setEnabled(False)
@@ -144,15 +176,14 @@ class InterfazGrafico(QMainWindow):
         self.fsm.setValidator(QIntValidator())
         self.flow.setValidator(QIntValidator())
         self.fhigh.setValidator(QIntValidator())
+        self.tiempom.setValidator(QIntValidator())
         self.graficarm.setEnabled(False)
 #       frecuencia vs tiempo
-#        self.tffs.setValidator(QIntValidator())
-        self.FT_fh.setValidator(QIntValidator())
-        self.FT_fl.setValidator(QIntValidator())
-        self.FT_fs.setValidator(QIntValidator())
-#        self.TF_sh.setValidator(QIntValidator())
-#        self.TF_tl.setValidator(QIntValidator())
-#        self.TF_th.setValidator(QIntValidator())
+        self.ft_fs.setValidator(QIntValidator())
+        self.ft_fl.setValidator(QIntValidator())
+        self.ft_fh.setValidator(QIntValidator())
+        self.ft_ti.setValidator(QIntValidator())
+        self.ft_tf.setValidator(QIntValidator())
         self.graficarescalog.setEnabled(False)    
 
 
@@ -198,8 +229,13 @@ class InterfazGrafico(QMainWindow):
     def selec_canal(self): 
         # Selecciona y grafica un canal específico
         canal = int(self.campo_canal.text())
+        self.senal=np.squeeze(self.data[canal,0::])
+        #defino esto por que con esta senal trabajan los nuevos metodos para que tomen toda la senal y no solo 2000 puntos
+        self.senal=self.senal.reshape(1,self.senal.shape[0]*self.senal.shape[1])
+        print("LA SENAL DAAAA")
+        print(self.senal.shape)
+        print(self.senal.ndim)
         self.datos=self.__coordinador.devolver_canal(canal, self.__x_min, self.__x_max)
-        desc=self.__coordinador.Descomposicion(canal, self.__x_min, self.__x_max)
         self.__sc.graficar_senal(self.datos)
         print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
         print(self.datos)
@@ -217,6 +253,14 @@ class InterfazGrafico(QMainWindow):
         self.boton_single.setEnabled(True)
         self.boton_mult.setEnabled(True)
         self.boton_filtro.setEnabled(True)
+        #botones del welch
+        self.tipoDeVentanaComboBox1.setEnabled(True)
+        self.graficarw.setEnabled(True)
+        #botones del multitaper
+        self.graficarm.setEnabled(True)
+        #botones del fvst
+        self.graficarescalog.setEnabled(True)
+        
         return self.datos
         
             
@@ -286,7 +330,8 @@ class InterfazGrafico(QMainWindow):
         archivo.close()
     
     def Mostrar_senal(self):
-        self.senal=self.data[str(self.comboBox.currentText())]
+        #Con esto elijo la senal disponibles en el paquete cargado
+        self.senal=self.data[str(self.comboBox.currentText())] 
         self.__coordinador.recibirDatosSenal(self.senal)
         self.__x_min=0
         self.__x_max=2000
@@ -304,10 +349,12 @@ class InterfazGrafico(QMainWindow):
         #botones del fvst
         self.graficarescalog.setEnabled(True)
     
-    def Grafica_fvt(self):
-        fs=int(self.FT_fs.text())
-        fl=int(self.FT_fl.text())
-        fh=int(self.FT_fh.text())
+    def Me_Wavelet(self):
+        fl=int(self.ft_fl.text())
+        fh=int(self.ft_fh.text())
+        ti=int(self.ft_ti.text())
+        tf=int(self.ft_tf.text())
+        fs=int(self.ft_fs.text())
         senal=self.senal-np.mean(self.senal)
         senal=np.squeeze(senal)
         N=senal.shape[0]        
@@ -329,18 +376,14 @@ class InterfazGrafico(QMainWindow):
         # Para la primera epoca del segundo montaje calcular la transformada continua de Wavelet, usando Complex Morlet Wavelet
         [coef, freqs] = pywt.cwt(senal, scales, 'cmor', sampling_period)
         # Calcular la potencia 
-        power = np.power(np.abs(coef),2)
-        # Graficar el escalograma obtenido del análisis tiempo frecuencia
-        f, ax = plt.subplots(figsize=(15, 10))
-        scalogram = ax.contourf(time,
-                        freqs[(freqs >= 4) & (freqs <= 40)],
-                        power[(freqs >= 4) & (freqs <= 40),:],
-                         100, # Especificar 20 divisiones en las escalas de color 
-                         extend='both')
-        ax.set_ylim(4, 40)
-        ax.set_ylabel('Frequencia [Hz]')
-        ax.set_xlabel('Tiempo [s]')
-        cbar = plt.colorbar(scalogram)
+        power = (np.abs(coef)) ** 2
+        if ti>=tf or (ti==0 and tf==0):
+            #si no es logico simplemente muestra toda la grafica
+            ti=0
+            ti=int(ti)
+            tf=int(max(time))         
+        self.__sc.graficar_senal3D(time,freqs,power,fl,fh,ti,tf,fs)
+    
 
     def Me_Welch(self):
         self.senal=self.senal-np.mean(self.senal)
@@ -348,12 +391,18 @@ class InterfazGrafico(QMainWindow):
         solapamiento=int(self.welch_solapa.text())
         tipo=str(self.tipoDeVentanaComboBox1.currentText())
         fs=int(self.fsw.text())
-        nfft=int(self.nfft.text())
+        tamano=tamano*fs
+        #defino el nfft a partir de nperseg=tamano si es potencia 2, lo deja
+        if math.log2(tamano).is_integer()==True:
+            nfft=tamano
+            print("es igual         ")
+        else:#si no, pone el siguiente numero de potencia 2 
+            print("siguiente potencia       ")
+            nfft=int(2 ** np.ceil(math.log2(tamano)))
+            print("ceros agrgados"+str(nfft))
         f, Pxx = signal.welch(self.senal,fs,tipo,tamano, solapamiento, nfft, scaling='density')
-        self.__coordinador.recibirDatosSenal(Pxx)
-        self.__x_min=0
-        self.__x_max=2000
-        self.__sc.graficar_datos(self.__coordinador.devolverDatosSenal(self.__x_min,self.__x_max))
+        self.__sc.graficar_metodos(f,np.squeeze(Pxx),"welch")
+
     
     def Me_Multi(self):
         self.senal=self.senal-np.mean(self.senal)
@@ -362,31 +411,50 @@ class InterfazGrafico(QMainWindow):
         fhigh=int(self.fhigh.text())
         w=int(self.multiw.text())
         t=int(self.multit.text())
-        p=int(self.multip.text())
+        ntapers=int(self.multip.text())
+        tiempom=int(self.tiempom.text())
+        #como pido el numero de tapers tengo que sacar el parametro q con la siguiente formula
+        p=2*w*t-ntapers
         params = dict(fs = fsm, fpass = [flow, fhigh], tapers = [w, t, p], trialave = 1)
-        data = np.reshape(self.senal,(fsm*5,10),order='F')
+        #COMO TRIALAVE ES 1 LAS UNIDADES SON FRECUENCIAS 
+        print("estooooooooooooooooo")
+        print(self.senal.shape)
+        print(self.senal.ndim)
+        
+        if not self.senal.ndim == 2:#esto para que funcione con las senales de 8 canales
+            print("si entraaaaaa")
+            self.senal=np.squeeeze(self.senal)
+            print(self.senal.shape)
+        b=int(self.senal.shape[1]/(fsm*tiempom))
+        data = np.reshape(self.senal,(fsm*tiempom,b),order='F')
         Pxx, f = mtspectrumc(data, params)
-        Pxx=Pxx[(f >= 4) & (f <= 40)]
-        Pxx=Pxx.reshape(1,len(Pxx))
-        self.__coordinador.recibirDatosSenal(Pxx)
-        self.__x_min=0
-        self.__x_max=2000
-        self.__sc.graficar_datos(self.__coordinador.devolverDatosSenal(self.__x_min,self.__x_max))
+        Pxx=Pxx[(f >= flow) & (f <= fhigh)]
+        self.__sc.graficar_metodos(f,np.squeeze(Pxx),"multitaper")
     
         
     def cargar_senal(self):
+        self.barraexist=False# esto es para ver si hay barra y eliminarla
         #se abre el cuadro de dialogo para cargar
         #* son archivos .mat y .txt
+        self.boton_ok.setEnabled(False)
+        self.comboBox.clear()
+        self.comboBox.setEnabled(False)
         archivo_cargado, _ = QFileDialog.getOpenFileName(self, "Abrir seÃ±al","","Todos los archivos (*);;Archivos txt(*.txt)*;;Archivos mat (*.mat)*")
         if archivo_cargado != "":
             print(archivo_cargado)
             #la senal carga exitosamente entonces habilito los botones
             self.data = sio.loadmat(archivo_cargado)
             if len(self.data.keys()) <= 4:
-                self.data = self.data["data"]
+                n=np.zeros(0)
+                for i in self.data.keys():
+                    n=np.append(n,i)
+                self.data = self.data[n[-1]]
                 #volver continuos los datos
-                sensores,puntos,ensayos=self.data.shape
-                senal_continua=np.reshape(self.data,(sensores,puntos*ensayos),order="F")
+                if n[-1]=='data':#esto hay que generalizarlos con ndim
+                    sensores,puntos,ensayos=self.data.shape
+                    senal_continua=np.reshape(self.data,(sensores,puntos*ensayos),order="F")
+                if n[-1]=='ecg':
+                    senal_continua=np.reshape(self.data,(1,self.data.shape[0]),order="F")
                 #el coordinador recibe y guarda la senal en su propio .py, por eso no 
                 #necesito una variable que lo guarde en el .py interfaz
                 print('tipo de senal')
@@ -406,13 +474,12 @@ class InterfazGrafico(QMainWindow):
                 self.boton_disminuir.setEnabled(True)
                 self.boton_canal.setEnabled(True)            
             if len(self.data.keys()) > 4:
+                #agrego al combobox los nombres de cada denal
                 for item in list(self.data.keys())[3::]:
                     self.comboBox.addItem(item)
                 self.comboBox.setEnabled(True)
                 self.boton_ok.setEnabled(True)
                 self.boton_ok.clicked.connect(self.Mostrar_senal)
-                print("SENAL CARGADA")
-                print("SELECCIONE SENAL")
     
         
 

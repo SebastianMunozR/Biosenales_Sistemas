@@ -7,7 +7,8 @@ from interfaz import InterfazGrafico
 import sys
 from PyQt5.QtWidgets import QApplication
 from chronux.mtspectrumc import mtspectrumc
-
+from IPython import get_ipython
+import pywt
 class Principal(object):
     def __init__(self):        
         self.__app=QApplication(sys.argv)

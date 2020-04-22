@@ -5,7 +5,8 @@ Edison Sebastian Munoz Rodriguez     C.C 1214745427
 import numpy as np
 import math
 from chronux.mtspectrumc import mtspectrumc
-
+from IPython import get_ipython
+import pywt
 class Biosenal(object):
     def __init__(self,data=None):
 
